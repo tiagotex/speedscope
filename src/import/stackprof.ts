@@ -39,9 +39,29 @@ export function importFromStackprof(stackprofProfile: StackprofProfile): Profile
         ...frames[id],
       })
     }
-    if (stack.length === 1 && stack[0].name === '(garbage collection)') {
-      stack = prevStack.concat(stack)
-    }
+
+    // // Concatenate single garbage collection frame to previous stack instead of showing it as root stack
+    // if (stack[0].name === '(garbage collection)') {
+    //   // When the last previous stack frame is garbage collection then we can reuse that stack
+    //   if (prevStack[prevStack.length - 1].name === '(garbage collection)') {
+    //     stack = prevStack
+    //   } else {
+    //     // We only want to merge the garbage collection frame with the previous stack.
+    //     // Stackprof can return sub frames like `(marking)` and `(sweeping)`, we don't want to merge those to avoid
+    //     //having to do complex merge between previous stack and current stack.
+    //     stack = prevStack.concat(stack[0])
+    //   }
+    // }
+
+    // // Check for main thread io wait
+    // if (stack[0].name === '<main>' && stack[stack.length - 1].name === 'Puma::Single#run') {
+    //   stack = prevStack.concat({...stack[0], name: "(io wait)", file: undefined, line: undefined})
+    // }
+
+    // We can update this version to keep track of previousStackGCIndex and previousStackIOWaitIndex
+    // This way we can always know where it was to start the merge
+
+
     const nSamples = raw[i++]
 
     if (objectMode) {
